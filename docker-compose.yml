@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  apache_php:
+    build:
+      context: .
+    volumes:
+      - .:/var/www/html
+    ports: 
+      - 80:80

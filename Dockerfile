@@ -32,6 +32,8 @@ RUN apt-get update \
 RUN apt-get update && apt-get install -y \
         git \
         cron \
+        nano \
+        vim \
         libicu-dev \
         libzip-dev \
         libmemcached-dev \
@@ -71,7 +73,10 @@ RUN apt-get update && apt-get install -y \
         xdebug.idekey=docker \n\
         xdebug.remote_log=/var/www/html/xdebug.log \n\
         xdebug.default_enable=on \n\
-    " >> /usr/local/etc/php/conf.d/xdebug.ini
+    " >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "\n\
+        display_errors=0 \n\ 
+    " >> /usr/local/etc/php/conf.d/errors.ini
 
 RUN curl -sS https://getcomposer.org/installer \
     | php -- --install-dir=/usr/local/bin --filename=composer

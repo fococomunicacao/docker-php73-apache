@@ -1,9 +1,9 @@
-version: '3.8'
+version: '3.3'
 services:
   apache_php:
     build:
       context: .
     volumes:
-      - .:/var/www/html
+      - .:/var/www/html:Z
     ports: 
       - 80:80

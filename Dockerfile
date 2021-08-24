@@ -2,25 +2,25 @@ FROM php:7.3-apache
 
 COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 
-ENV ACCEPT_EULA=Y
+RUN apt-get update && apt-get install -y wget gnupg
 
-#  Adicionando repositorio do SQL Server, aceitando a licença e instalando :)
-RUN apt-get update \
-    && apt-get install -y \
-        wget \
-        gnupg \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/10/prod.list \
-        > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get install -y --no-install-recommends \
+RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
+    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
+
+# RUN ACCEPT_EULA=Y apt-get install -y mssql-tools \
+#     && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc \
+#     && source ~/.bashrc
+
+RUN apt-get install -y --no-install-recommends \
         locales \
         apt-transport-https \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
     && locale-gen \
-    && apt-get update \
-    && apt-get -y --no-install-recommends install \
-        unixodbc-dev \
-        msodbcsql17 \
     && pecl install sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv
 
@@ -64,15 +64,7 @@ RUN apt-get update && apt-get install -y \
     && pecl install xdebug \
     && echo "\n\
         zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so) \n\
-        xdebug.remote_log = /var/www/html/xdebug.log \n\
-        xdebug.remote_enable=on \n\
-        xdebug.remote_handler=dbgp \n\
-        xdebug.remote_port=9000 \n\
-        xdebug.remote_autostart=on \n\
-        xdebug.remote_connect_back=on \n\
-        xdebug.idekey=docker \n\
-        xdebug.remote_log=/var/www/html/xdebug.log \n\
-        xdebug.default_enable=on \n\
+        xdebug.mode=debug \n\
     " >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "\n\
         display_errors=0 \n\ 

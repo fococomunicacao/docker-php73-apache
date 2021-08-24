@@ -1,9 +1,15 @@
-version: '3.3'
+version: "3.5"
+
 services:
-  apache_php:
+  phpserver:
+    container_name: php73-apache
     build:
-      context: .
+      context: ./
+      dockerfile: ./Dockerfile
     volumes:
       - .:/var/www/html:Z
-    ports: 
-      - 80:80
+    ports:
+      - "80:80"
+    environment:
+      XDEBUG_CONFIG: client_host=172.29.48.128 client_port=9003 mode=debug remote_enable=1 discover_client_host
+      XDEBUG_SESSION: VSCODE
